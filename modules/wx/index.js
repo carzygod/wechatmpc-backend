@@ -58,9 +58,11 @@ function wxLogin(req, res) {
 
 
   async function getWxQrcode(req, res) {
-    const qrcode_key = "random"
-    const url = `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${accessToken}`
-    fetch(url, {
+ try {
+    const qrcode_key = "random";
+    const url = `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${accessToken}`;
+    
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -73,15 +75,20 @@ function wxLogin(req, res) {
         // env_version: "release",
         check_path: false
       })
-    }).then(async (response) => {
-      res.setHeader("Access-Control-Expose-Headers", "scene")
-      res.setHeader("scene", qrcode_key)
-      response.body.pipe(res)
-    })
-    .catch((err) => {
-        console.error(err)
-        res.status(500).send(err.message)
-      })
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`微信API返回错误: ${response.status} - ${errorText}`);
+    }
+    res.setHeader("Access-Control-Expose-Headers", "scene");
+    res.setHeader("scene", qrcode_key);
+    res.setHeader("Content-Type", "image/png");
+    const buffer = await response.arrayBuffer();
+    res.send(Buffer.from(buffer));
+  } catch (err) {
+    console.error("获取微信小程序码出错:", err);
+    res.status(500).send(err.message);
+  }
   }
 module.exports = {
     wxLogin,

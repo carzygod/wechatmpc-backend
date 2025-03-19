@@ -63,6 +63,11 @@ app.post('/wechat/dl', async function(req, res) {
     return modules.wx.getDeeplink(req,res)
 })
 
+app.post('/wechat/dl/:msg', async function(req, res) {
+    return modules.wx.getQuickDeeplink(req,res)
+})
+
+
 app.post('/connect', async function(req, res) {
     try{
         const verfi = tgVerfiy(process.env.TELEGRAMAPI, req.body.initData)

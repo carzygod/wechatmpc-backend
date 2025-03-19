@@ -57,9 +57,9 @@ function wxLogin(req, res) {
   }
 
 
-  async function getWxQrcode(req, res) {
+async function getWxQrcode(req, res) {
  try {
-    const qrcode_key = "random";
+    const qrcode_key = "4k6oagQMoHDshheYKQwarif91CxiRCfEq8GmLUUKUKuBr9eZcr9B5AiNH9pygDUML2ykpw9kD12Nkcb9tJUWrzpTY3V2SpSwBB2hwF4xYdxuheCk1LQB3XkSobSnsPoWgvv6kqWup93m5ELP4ZY5gbJue4AkUxgPjCiTEFKRedNjt7mVvDN2vXanqNeySZzBPDpmJXjvA1wJi1JmSTz9xu5gzJ8";
     const url = `https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=${accessToken}`;
     
     const response = await fetch(url, {
@@ -89,9 +89,47 @@ function wxLogin(req, res) {
     console.error("获取微信小程序码出错:", err);
     res.status(500).send(err.message);
   }
-  }
+}
+async function getDeeplink(req, res) {
+  try {
+     const query = "4k6oagQMoHDshheYKQwarif";
+     const url = `https://api.weixin.qq.com/wxa/generatescheme?access_token=${accessToken}`;
+     
+     const response = await fetch(url, {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json"
+       },
+       body: JSON.stringify({
+        "jump_wxa":{
+          path: "pages/QR/QR",
+          query: query,
+          env_version: "trial",
+        },
+        "is_expire":true,
+        "expire_type":1,
+        "expire_interval":1
+       })
+     });
+     if (!response.ok) {
+       const errorText = await response.text();
+       throw new Error(`微信API返回错误: ${response.status} - ${errorText}`);
+     }
+        const ret =  await response.json();
+        console.log(
+           ret
+            )
+     res.send(
+      ret
+     );
+   } catch (err) {
+     console.error("获取微信小程序码出错:", err);
+     res.status(500).send(err.message);
+   }
+   }
 module.exports = {
     wxLogin,
     getWxQrcode,
-    ACTokenManager
+    ACTokenManager,
+    getDeeplink
 }

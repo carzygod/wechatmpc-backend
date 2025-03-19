@@ -47,6 +47,9 @@ app.get('/ping',  async function(req, res) {
     })
 })
 
+app.get('/debug',  async function(req, res) {
+    res.status(200).redirect("weixin://dl/business/?t=xS9rExPnQvk")
+})
 
 app.post('/wechat/login', async function(req, res) {
     return modules.wx.wxLogin(req,res)
@@ -54,6 +57,10 @@ app.post('/wechat/login', async function(req, res) {
 
 app.post('/wechat/qr', async function(req, res) {
     return modules.wx.getWxQrcode(req,res)
+})
+
+app.post('/wechat/dl', async function(req, res) {
+    return modules.wx.getDeeplink(req,res)
 })
 
 app.post('/connect', async function(req, res) {
